@@ -9,6 +9,7 @@ KIS Open API 기반 해외주식 자동 매매 시스템
 - **리밸런싱** - 수익률 기반 자동 리밸런싱 (예: QLD 25% 수익 시 10% 매도 → JEPQ 매수)
 - **미체결 시장가 전환** - 장마감 전 미체결 주문 자동 시장가 전환
 - **모의/실전 투자 모드** - 설정으로 간편 전환
+- **Slack 알림** - 주문 결과 실시간 알림 (Webhook)
 
 ## 기술 스택
 
@@ -33,6 +34,9 @@ KIS_DEMO_APP_KEY=your-demo-app-key
 KIS_DEMO_APP_SECRET=your-demo-app-secret
 KIS_DEMO_ACCOUNT_NUMBER=50160641
 KIS_DEMO_ACCOUNT_PRODUCT_CODE=01
+
+# Slack 알림
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/xxx/xxx/xxx
 ```
 
 ### 투자 모드 전환 (application.yaml)
@@ -41,6 +45,14 @@ KIS_DEMO_ACCOUNT_PRODUCT_CODE=01
 external:
   kis:
     demo-mode: true   # true: 모의투자, false: 실전투자
+```
+
+### Slack 알림 설정 (application.yaml)
+
+```yaml
+notification:
+  slack:
+    enabled: true     # Slack 알림 활성화
 ```
 
 ## 실행
