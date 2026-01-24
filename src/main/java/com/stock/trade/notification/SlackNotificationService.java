@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ public class SlackNotificationService {
         this.webClient = WebClient.create();
     }
 
+    private static final ZoneId SEOUL_ZONE = ZoneId.of("Asia/Seoul");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     /**
@@ -46,7 +48,7 @@ public class SlackNotificationService {
 
         StringBuilder message = new StringBuilder();
         message.append(emoji).append(" *주간 정기 매수 완료*\n");
-        message.append("시각: ").append(LocalDateTime.now().format(TIME_FORMAT)).append("\n\n");
+        message.append("시각: ").append(LocalDateTime.now(SEOUL_ZONE).format(TIME_FORMAT)).append("\n\n");
 
         for (PurchaseResult result : results) {
             if (result.success()) {
@@ -75,7 +77,7 @@ public class SlackNotificationService {
 
         StringBuilder message = new StringBuilder();
         message.append(emoji).append(" *월간 리밸런싱 완료*\n");
-        message.append("시각: ").append(LocalDateTime.now().format(TIME_FORMAT)).append("\n\n");
+        message.append("시각: ").append(LocalDateTime.now(SEOUL_ZONE).format(TIME_FORMAT)).append("\n\n");
 
         for (PurchaseResult result : results) {
             String action = result.symbol().contains("_SELL") ? "매도" : "매수";
@@ -107,7 +109,7 @@ public class SlackNotificationService {
 
         StringBuilder message = new StringBuilder();
         message.append(emoji).append(" *미체결 주문 시장가 전환*\n");
-        message.append("시각: ").append(LocalDateTime.now().format(TIME_FORMAT)).append("\n\n");
+        message.append("시각: ").append(LocalDateTime.now(SEOUL_ZONE).format(TIME_FORMAT)).append("\n\n");
 
         for (MarketFallbackResult result : results) {
             if (result.success()) {
@@ -137,7 +139,7 @@ public class SlackNotificationService {
 
         StringBuilder message = new StringBuilder();
         message.append(":bank: *주간 잔액 알림*\n");
-        message.append("시각: ").append(LocalDateTime.now().format(TIME_FORMAT)).append("\n\n");
+        message.append("시각: ").append(LocalDateTime.now(SEOUL_ZONE).format(TIME_FORMAT)).append("\n\n");
 
         message.append(":kr: *원화 잔액*: ").append(String.format("%,.0f", krwBalance)).append("원\n");
         message.append(":us: *달러 잔액*: $").append(String.format("%,.2f", usdBalance)).append("\n");
@@ -162,7 +164,7 @@ public class SlackNotificationService {
 
         StringBuilder message = new StringBuilder();
         message.append(":bank: *주간 잔액 알림*\n");
-        message.append("시각: ").append(LocalDateTime.now().format(TIME_FORMAT)).append("\n\n");
+        message.append("시각: ").append(LocalDateTime.now(SEOUL_ZONE).format(TIME_FORMAT)).append("\n\n");
 
         message.append(":us: *달러 잔액*: $").append(String.format("%,.2f", usdBalance)).append("\n");
         message.append(":currency_exchange: *현재 환율*: ").append(String.format("%,.2f", exchangeRate)).append("원/$\n\n");
@@ -181,7 +183,7 @@ public class SlackNotificationService {
         }
 
         String message = ":rotating_light: *" + title + "*\n" +
-                "시각: " + LocalDateTime.now().format(TIME_FORMAT) + "\n\n" +
+                "시각: " + LocalDateTime.now(SEOUL_ZONE).format(TIME_FORMAT) + "\n\n" +
                 "```" + errorMessage + "```";
 
         sendMessage(message);
