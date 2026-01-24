@@ -1,6 +1,7 @@
 package com.stock.trade.scheduler;
 
 import com.stock.trade.config.KisProperties;
+import com.stock.trade.notification.SlackNotificationService;
 import com.stock.trade.overseas.*;
 import com.stock.trade.scheduler.ScheduledPurchaseProperties.RebalanceConfig;
 import com.stock.trade.scheduler.ScheduledPurchaseProperties.StockPurchaseConfig;
@@ -28,11 +29,15 @@ import java.util.List;
 @Service
 public class MonthlyPurchaseScheduler extends AbstractPurchaseScheduler {
 
+    private final SlackNotificationService slackNotificationService;
+
     public MonthlyPurchaseScheduler(ScheduledPurchaseProperties properties,
                                     KisProperties kisProperties,
                                     OverseasOrderService orderService,
-                                    OverseasStockService stockService) {
+                                    OverseasStockService stockService,
+                                    SlackNotificationService slackNotificationService) {
         super(properties, kisProperties, orderService, stockService);
+        this.slackNotificationService = slackNotificationService;
     }
 
     @Override
@@ -50,7 +55,8 @@ public class MonthlyPurchaseScheduler extends AbstractPurchaseScheduler {
      */
     @Scheduled(cron = "${scheduler.purchase.monthly-cron:0 30 23 ? * MON#1}", zone = "Asia/Seoul")
     public void execute() {
-        executeRebalance();
+        List<PurchaseResult> results = executeRebalance();
+        slackNotificationService.notifyMonthlyRebalanceResult(results);
     }
 
     /**

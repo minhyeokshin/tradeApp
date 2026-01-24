@@ -1,5 +1,6 @@
 package com.stock.trade.scheduler;
 
+import com.stock.trade.notification.SlackNotificationService;
 import com.stock.trade.scheduler.AbstractPurchaseScheduler.PurchaseResult;
 import com.stock.trade.scheduler.MarketFallbackScheduler.MarketFallbackResult;
 import lombok.RequiredArgsConstructor;
@@ -22,19 +23,24 @@ public class ScheduledPurchaseService {
     private final MonthlyPurchaseScheduler monthlyScheduler;
     private final MarketFallbackScheduler fallbackScheduler;
     private final ScheduledPurchaseProperties properties;
+    private final SlackNotificationService slackNotificationService;
 
     /**
      * 주간 매수 수동 실행
      */
     public List<PurchaseResult> executeWeeklyManually() {
-        return weeklyScheduler.executeManually();
+        List<PurchaseResult> results = weeklyScheduler.executeManually();
+        slackNotificationService.notifyWeeklyPurchaseResult(results);
+        return results;
     }
 
     /**
      * 월간 매수 수동 실행
      */
     public List<PurchaseResult> executeMonthlyManually() {
-        return monthlyScheduler.executeManually();
+        List<PurchaseResult> results = monthlyScheduler.executeManually();
+        slackNotificationService.notifyMonthlyRebalanceResult(results);
+        return results;
     }
 
     /**
@@ -43,9 +49,15 @@ public class ScheduledPurchaseService {
     public List<PurchaseResult> executeAllManually() {
         log.info("========== 전체 매수 수동 실행 ==========");
 
+        List<PurchaseResult> weeklyResults = weeklyScheduler.executeManually();
+        slackNotificationService.notifyWeeklyPurchaseResult(weeklyResults);
+
+        List<PurchaseResult> monthlyResults = monthlyScheduler.executeManually();
+        slackNotificationService.notifyMonthlyRebalanceResult(monthlyResults);
+
         List<PurchaseResult> allResults = new ArrayList<>();
-        allResults.addAll(weeklyScheduler.executeManually());
-        allResults.addAll(monthlyScheduler.executeManually());
+        allResults.addAll(weeklyResults);
+        allResults.addAll(monthlyResults);
 
         return allResults;
     }
@@ -54,7 +66,9 @@ public class ScheduledPurchaseService {
      * 미체결 주문 시장가 전환 수동 실행
      */
     public List<MarketFallbackResult> checkUnfilledManually() {
-        return fallbackScheduler.executeManually();
+        List<MarketFallbackResult> results = fallbackScheduler.executeManually();
+        slackNotificationService.notifyMarketFallbackResult(results);
+        return results;
     }
 
     /**

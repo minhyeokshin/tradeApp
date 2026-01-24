@@ -74,6 +74,15 @@ scheduler:
       sell-rate: 0.10                # 매도 비율 (10%)
       discount-rate: 0.02            # 지정가 주문 할인율 (2%)
 
+# Slack 알림 설정
+notification:
+  slack:
+    enabled: false                                  # Slack 알림 활성화 여부
+    webhook-url: ${SLACK_WEBHOOK_URL:}              # Slack Incoming Webhook URL
+    channel:                                        # 채널 (기본값: webhook 설정 채널)
+    username: Trade Bot                             # 봇 이름
+    icon-emoji: ":chart_with_upwards_trend:"        # 봇 아이콘
+
 management:
   endpoints:
     web:

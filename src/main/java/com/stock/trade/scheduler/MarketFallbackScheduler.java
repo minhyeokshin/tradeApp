@@ -1,6 +1,7 @@
 package com.stock.trade.scheduler;
 
 import com.stock.trade.config.KisProperties;
+import com.stock.trade.notification.SlackNotificationService;
 import com.stock.trade.overseas.*;
 import com.stock.trade.scheduler.ScheduledPurchaseProperties.StockPurchaseConfig;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class MarketFallbackScheduler {
     private final ScheduledPurchaseProperties properties;
     private final KisProperties kisProperties;
     private final OverseasOrderService orderService;
+    private final SlackNotificationService slackNotificationService;
 
     /**
      * 장마감 1시간 전 미체결 주문 시장가 전환
@@ -57,6 +59,7 @@ public class MarketFallbackScheduler {
         }
 
         logSummary(results);
+        slackNotificationService.notifyMarketFallbackResult(results);
     }
 
     /**

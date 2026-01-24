@@ -1,6 +1,7 @@
 package com.stock.trade.scheduler;
 
 import com.stock.trade.config.KisProperties;
+import com.stock.trade.notification.SlackNotificationService;
 import com.stock.trade.overseas.*;
 import com.stock.trade.scheduler.ScheduledPurchaseProperties.StockPurchaseConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +28,15 @@ import java.util.List;
 @Service
 public class WeeklyPurchaseScheduler extends AbstractPurchaseScheduler {
 
+    private final SlackNotificationService slackNotificationService;
+
     public WeeklyPurchaseScheduler(ScheduledPurchaseProperties properties,
                                    KisProperties kisProperties,
                                    OverseasOrderService orderService,
-                                   OverseasStockService stockService) {
+                                   OverseasStockService stockService,
+                                   SlackNotificationService slackNotificationService) {
         super(properties, kisProperties, orderService, stockService);
+        this.slackNotificationService = slackNotificationService;
     }
 
     @Override
@@ -49,7 +54,8 @@ public class WeeklyPurchaseScheduler extends AbstractPurchaseScheduler {
      */
     @Scheduled(cron = "${scheduler.purchase.weekly-cron:0 30 23 * * MON}", zone = "Asia/Seoul")
     public void execute() {
-        executePurchase();
+        List<PurchaseResult> results = executePurchase();
+        slackNotificationService.notifyWeeklyPurchaseResult(results);
     }
 
     /**
