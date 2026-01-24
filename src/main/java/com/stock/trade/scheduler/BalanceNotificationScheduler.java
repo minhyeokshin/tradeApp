@@ -2,7 +2,8 @@ package com.stock.trade.scheduler;
 
 import com.stock.trade.config.KisProperties;
 import com.stock.trade.notification.SlackNotificationService;
-import com.stock.trade.overseas.ForeignMargin;
+import com.stock.trade.overseas.OverseasExchange;
+import com.stock.trade.overseas.OverseasPurchasableAmount;
 import com.stock.trade.overseas.OverseasStockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 
 /**
  * 잔액 알림 스케줄러
@@ -56,24 +56,22 @@ public class BalanceNotificationScheduler {
         stockService.setDemoMode(kisProperties.isDemoMode());
 
         try {
-            List<ForeignMargin> margins = stockService.getForeignMargin();
+            // 매수가능금액 조회 API 사용 (QQQ 기준 $1로 조회)
+            OverseasPurchasableAmount purchasable = stockService.getPurchasableAmount(
+                    OverseasExchange.NASDAQ, "QQQ", BigDecimal.ONE);
 
-            BigDecimal krwBalance = BigDecimal.ZERO;
-            BigDecimal usdBalance = BigDecimal.ZERO;
-            BigDecimal exchangeRate = BigDecimal.ZERO;
+            BigDecimal usdBalance = purchasable.availableAmount() != null
+                    ? purchasable.availableAmount() : BigDecimal.ZERO;
+            BigDecimal exchangeRate = purchasable.exchangeRate() != null
+                    ? purchasable.exchangeRate() : properties.getDefaultExchangeRate();
 
-            for (ForeignMargin margin : margins) {
-                if ("KRW".equals(margin.currencyCode())) {
-                    krwBalance = margin.depositAmount() != null ? margin.depositAmount() : BigDecimal.ZERO;
-                } else if ("USD".equals(margin.currencyCode())) {
-                    usdBalance = margin.depositAmount() != null ? margin.depositAmount() : BigDecimal.ZERO;
-                    exchangeRate = margin.exchangeRate() != null ? margin.exchangeRate() : BigDecimal.ZERO;
-                }
-            }
+            // 원화 잔액은 매수가능금액 API에서 직접 제공되지 않음
+            // maxOrderAmount를 환율로 나눠 추정하거나, 달러 잔액만 표시
+            BigDecimal krwEstimate = usdBalance.multiply(exchangeRate);
 
-            log.info("원화 잔액: {}원, 달러 잔액: ${}, 환율: {}", krwBalance, usdBalance, exchangeRate);
+            log.info("달러 잔액: ${}, 환율: {}", usdBalance, exchangeRate);
 
-            slackNotificationService.notifyBalance(krwBalance, usdBalance, exchangeRate);
+            slackNotificationService.notifyBalanceSimple(usdBalance, exchangeRate);
 
         } catch (Exception e) {
             log.error("잔액 조회 실패: {}", e.getMessage());

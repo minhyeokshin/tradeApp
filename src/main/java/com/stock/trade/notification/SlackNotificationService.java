@@ -150,6 +150,29 @@ public class SlackNotificationService {
     }
 
     /**
+     * 잔액 알림 (간단 버전 - 달러만)
+     */
+    public void notifyBalanceSimple(BigDecimal usdBalance, BigDecimal exchangeRate) {
+        if (!slackProperties.isEnabled()) {
+            return;
+        }
+
+        // 원화 환산액 계산
+        BigDecimal usdInKrw = usdBalance.multiply(exchangeRate).setScale(0, RoundingMode.DOWN);
+
+        StringBuilder message = new StringBuilder();
+        message.append(":bank: *주간 잔액 알림*\n");
+        message.append("시각: ").append(LocalDateTime.now().format(TIME_FORMAT)).append("\n\n");
+
+        message.append(":us: *달러 잔액*: $").append(String.format("%,.2f", usdBalance)).append("\n");
+        message.append(":currency_exchange: *현재 환율*: ").append(String.format("%,.2f", exchangeRate)).append("원/$\n\n");
+
+        message.append(":moneybag: *원화 환산액*: ").append(String.format("%,.0f", usdInKrw)).append("원");
+
+        sendMessage(message.toString());
+    }
+
+    /**
      * 오류 알림
      */
     public void notifyError(String title, String errorMessage) {
