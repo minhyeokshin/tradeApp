@@ -1,6 +1,5 @@
 #!/bin/bash
 # 모의투자 모드로 전환
-cd /home/ubuntu/tradeApp
 
 cat > .env << 'EOF'
 # 투자 모드
