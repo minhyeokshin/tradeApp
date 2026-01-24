@@ -11,7 +11,9 @@
       "Bash(./gradlew build:*)",
       "Bash(./gradlew cleanTest test:*)",
       "Bash(curl:*)",
-      "Bash(printf:*)"
+      "Bash(printf:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)"
     ]
   },
   "mcpServers": {

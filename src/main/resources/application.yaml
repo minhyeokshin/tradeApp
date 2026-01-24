@@ -30,14 +30,14 @@ external:
     demo-ws-url: ws://ops.koreainvestment.com:31000              # 모의투자 WebSocket
 
     # ===== 실전투자 인증 정보 =====
-    app-key: ${KIS_APP_KEY:your-app-key}
-    app-secret: ${KIS_APP_SECRET:your-app-secret}
+    app-key: ${KIS_APP_KEY:}
+    app-secret: ${KIS_APP_SECRET:}
     account-number: ${KIS_ACCOUNT_NUMBER:}       # 계좌번호 앞 8자리
     account-product-code: ${KIS_ACCOUNT_PRODUCT_CODE:01}  # 계좌번호 뒤 2자리
 
     # ===== 모의투자 인증 정보 =====
-    demo-app-key: ${KIS_DEMO_APP_KEY:your-demo-app-key}
-    demo-app-secret: ${KIS_DEMO_APP_SECRET:your-demo-app-secret}
+    demo-app-key: ${KIS_DEMO_APP_KEY:}
+    demo-app-secret: ${KIS_DEMO_APP_SECRET:}
     demo-account-number: ${KIS_DEMO_ACCOUNT_NUMBER:}       # 모의투자 계좌번호 앞 8자리
     demo-account-product-code: ${KIS_DEMO_ACCOUNT_PRODUCT_CODE:01}  # 모의투자 계좌번호 뒤 2자리
 
@@ -78,7 +78,7 @@ scheduler:
 notification:
   slack:
     enabled: true                                  # Slack 알림 활성화 여부
-    webhook-url: ${SLACK_WEBHOOK_URL:}              # Slack Incoming Webhook URL
+    webhook-url: ${SLACK_WEBHOOK_URL:}               # Slack Incoming Webhook URL
     channel:                                        # 채널 (기본값: webhook 설정 채널)
     username: Trade Bot                             # 봇 이름
     icon-emoji: ":chart_with_upwards_trend:"        # 봇 아이콘
