@@ -1,0 +1,30 @@
+# Oracle Cloud / 프로덕션용 (이미지 pull만 함)
+services:
+  trade:
+    image: ghcr.io/minhyeokshin/tradeapp:latest
+    container_name: trade-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      # 투자 모드 (true: 모의투자, false: 실전투자)
+      - KIS_DEMO_MODE=${KIS_DEMO_MODE:-true}
+      # 실전투자 인증
+      - KIS_APP_KEY=${KIS_APP_KEY}
+      - KIS_APP_SECRET=${KIS_APP_SECRET}
+      - KIS_ACCOUNT_NUMBER=${KIS_ACCOUNT_NUMBER}
+      - KIS_ACCOUNT_PRODUCT_CODE=${KIS_ACCOUNT_PRODUCT_CODE}
+      # 모의투자 인증
+      - KIS_DEMO_APP_KEY=${KIS_DEMO_APP_KEY}
+      - KIS_DEMO_APP_SECRET=${KIS_DEMO_APP_SECRET}
+      - KIS_DEMO_ACCOUNT_NUMBER=${KIS_DEMO_ACCOUNT_NUMBER}
+      - KIS_DEMO_ACCOUNT_PRODUCT_CODE=${KIS_DEMO_ACCOUNT_PRODUCT_CODE}
+      # Slack 알림
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
