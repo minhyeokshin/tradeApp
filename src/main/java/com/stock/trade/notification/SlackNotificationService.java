@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -117,6 +119,32 @@ public class SlackNotificationService {
                 message.append("   사유: ").append(result.errorMessage()).append("\n");
             }
         }
+
+        sendMessage(message.toString());
+    }
+
+    /**
+     * 잔액 알림
+     */
+    public void notifyBalance(BigDecimal krwBalance, BigDecimal usdBalance, BigDecimal exchangeRate) {
+        if (!slackProperties.isEnabled()) {
+            return;
+        }
+
+        // 원화 환산 총액 계산
+        BigDecimal usdInKrw = usdBalance.multiply(exchangeRate).setScale(0, RoundingMode.DOWN);
+        BigDecimal totalKrw = krwBalance.add(usdInKrw);
+
+        StringBuilder message = new StringBuilder();
+        message.append(":bank: *주간 잔액 알림*\n");
+        message.append("시각: ").append(LocalDateTime.now().format(TIME_FORMAT)).append("\n\n");
+
+        message.append(":kr: *원화 잔액*: ").append(String.format("%,.0f", krwBalance)).append("원\n");
+        message.append(":us: *달러 잔액*: $").append(String.format("%,.2f", usdBalance)).append("\n");
+        message.append(":currency_exchange: *현재 환율*: ").append(String.format("%,.2f", exchangeRate)).append("원/$\n\n");
+
+        message.append(":moneybag: *원화 환산 총액*: ").append(String.format("%,.0f", totalKrw)).append("원\n");
+        message.append("   (달러 환산: ").append(String.format("%,.0f", usdInKrw)).append("원)");
 
         sendMessage(message.toString());
     }

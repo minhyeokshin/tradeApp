@@ -49,6 +49,7 @@ scheduler:
     weekly-cron: "0 30 23 * * MON"       # 매주 월요일 23:30 (KST) - 장 시작
     monthly-cron: "0 30 23 ? * MON#1"    # 매달 첫번째 월요일 23:30 (KST)
     fallback-cron: "0 0 5 * * MON-FRI"   # 평일 05:00 (KST) - 장마감 1시간 전 미체결 체크
+    balance-cron: "0 0 10 * * MON"       # 매주 월요일 10:00 (KST) - 잔액 알림
 
     # 주간 매수 종목 (매주 월요일)
     # budget-krw 설정 시: 원화 예산 기준 자동 수량 계산

@@ -25,6 +25,7 @@ public class ScheduledPurchaseController {
     private final ScheduledPurchaseProperties properties;
     private final KisProperties kisProperties;
     private final SlackNotificationService slackNotificationService;
+    private final BalanceNotificationScheduler balanceNotificationScheduler;
 
     /**
      * 스케줄러 설정 조회
@@ -127,5 +128,15 @@ public class ScheduledPurchaseController {
         log.info("Slack 알림 테스트 요청");
         slackNotificationService.sendCustomMessage(":white_check_mark: *Trade Bot Test*\nSlack notification is working!");
         return ResponseEntity.ok(Map.of("message", "Slack test message sent"));
+    }
+
+    /**
+     * 잔액 알림 테스트
+     */
+    @PostMapping("/balance/test")
+    public ResponseEntity<Map<String, String>> testBalance() {
+        log.info("잔액 알림 테스트 요청");
+        balanceNotificationScheduler.executeManually();
+        return ResponseEntity.ok(Map.of("message", "Balance notification sent"));
     }
 }

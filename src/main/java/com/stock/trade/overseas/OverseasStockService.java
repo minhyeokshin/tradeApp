@@ -28,10 +28,12 @@ public class OverseasStockService {
     private static final String PRICE_API_PATH = "/uapi/overseas-price/v1/quotations/price";
     private static final String BALANCE_API_PATH = "/uapi/overseas-stock/v1/trading/inquire-balance";
     private static final String PSAMOUNT_API_PATH = "/uapi/overseas-stock/v1/trading/inquire-psamount";
+    private static final String FOREIGN_MARGIN_API_PATH = "/uapi/overseas-stock/v1/trading/foreign-margin";
 
     private static final String TR_ID_PRICE = "HHDFS00000300";
     private static final String TR_ID_BALANCE = "TTTS3012R";
     private static final String TR_ID_PSAMOUNT = "TTTS3007R";
+    private static final String TR_ID_FOREIGN_MARGIN = "TTTC2101R";
 
     /**
      * 모의투자 여부
@@ -262,6 +264,55 @@ public class OverseasStockService {
         }
     }
 
+    /**
+     * 해외증거금 통화별 조회 (원화/달러 잔액)
+     *
+     * @return 통화별 증거금 목록
+     */
+    public List<ForeignMargin> getForeignMargin() {
+        log.info("해외증거금 통화별 조회");
+
+        if (kisProperties.getEffectiveAccountNumber() == null || kisProperties.getEffectiveAccountNumber().isBlank()) {
+            throw new OverseasStockException("계좌번호가 설정되지 않았습니다");
+        }
+
+        try {
+            ForeignMarginResponse response = kisWebClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(FOREIGN_MARGIN_API_PATH)
+                            .queryParam("CANO", kisProperties.getEffectiveAccountNumber())
+                            .queryParam("ACNT_PRDT_CD", kisProperties.getEffectiveAccountProductCode())
+                            .build())
+                    .header("authorization", tokenManager.getAuthorizationHeader())
+                    .header("appkey", kisProperties.getEffectiveAppKey())
+                    .header("appsecret", kisProperties.getEffectiveAppSecret())
+                    .header("tr_id", TR_ID_FOREIGN_MARGIN)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(ForeignMarginResponse.class)
+                    .block();
+
+            if (response != null && response.isSuccess()) {
+                log.info("해외증거금 통화별 조회 완료 - {}건", response.output().size());
+                return response.output();
+            } else {
+                String errorMsg = response != null ? response.message() : "응답 없음";
+                log.error("해외증거금 통화별 조회 실패 - 오류: {}", errorMsg);
+                throw new OverseasStockException("해외증거금 통화별 조회 실패: " + errorMsg);
+            }
+        } catch (WebClientResponseException e) {
+            log.error("해외증거금 통화별 조회 API 오류 - 상태코드: {}, 응답: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new OverseasStockException("해외증거금 통화별 조회 API 오류: " + e.getMessage(), e);
+        } catch (Exception e) {
+            if (e instanceof OverseasStockException) {
+                throw e;
+            }
+            log.error("해외증거금 통화별 조회 중 예외 발생", e);
+            throw new OverseasStockException("해외증거금 통화별 조회 중 오류: " + e.getMessage(), e);
+        }
+    }
+
     private String getApiExchangeCode(OverseasExchange exchange) {
         return switch (exchange) {
             case NASDAQ, NASDAQ_DAY -> "NASD";
@@ -314,6 +365,20 @@ public class OverseasStockService {
             @JsonProperty("msg_cd") String messageCode,
             @JsonProperty("msg1") String message,
             @JsonProperty("output") OverseasPurchasableAmount output
+    ) {
+        boolean isSuccess() {
+            return "0".equals(returnCode);
+        }
+    }
+
+    /**
+     * 해외증거금 통화별 API 응답 래퍼
+     */
+    private record ForeignMarginResponse(
+            @JsonProperty("rt_cd") String returnCode,
+            @JsonProperty("msg_cd") String messageCode,
+            @JsonProperty("msg1") String message,
+            @JsonProperty("output") List<ForeignMargin> output
     ) {
         boolean isSuccess() {
             return "0".equals(returnCode);
