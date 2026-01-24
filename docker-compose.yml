@@ -1,0 +1,10 @@
+services:
+  trade:
+    build: .
+    container_name: trade-app
+    ports:
+      - "8080:8080"
+    environment:
+      - KIS_APP_KEY=${KIS_APP_KEY}
+      - KIS_APP_SECRET=${KIS_APP_SECRET}
+    restart: unless-stopped

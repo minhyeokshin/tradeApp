@@ -1,0 +1,90 @@
+spring:
+  application:
+    name: trade
+
+  jackson:
+    time-zone: Asia/Seoul
+    property-naming-strategy: SNAKE_CASE
+
+  messages:
+    basename: messages
+    encoding: UTF-8
+
+  webflux:
+    timeout:
+      connect: 3s
+      read: 5s
+
+server:
+  port: 8080
+
+external:
+  kis:
+    # ===== 투자 모드 설정 =====
+    demo-mode: true                              # true: 모의투자, false: 실전투자
+
+    # ===== API URL (자동 선택됨) =====
+    base-url: https://openapi.koreainvestment.com:9443           # 실전투자 URL
+    demo-base-url: https://openapivts.koreainvestment.com:29443  # 모의투자 URL
+    ws-url: ws://ops.koreainvestment.com:21000                   # 실전투자 WebSocket
+    demo-ws-url: ws://ops.koreainvestment.com:31000              # 모의투자 WebSocket
+
+    # ===== 실전투자 인증 정보 =====
+    app-key: ${KIS_APP_KEY:your-app-key}
+    app-secret: ${KIS_APP_SECRET:your-app-secret}
+    account-number: ${KIS_ACCOUNT_NUMBER:}       # 계좌번호 앞 8자리
+    account-product-code: ${KIS_ACCOUNT_PRODUCT_CODE:01}  # 계좌번호 뒤 2자리
+
+    # ===== 모의투자 인증 정보 =====
+    demo-app-key: ${KIS_DEMO_APP_KEY:your-demo-app-key}
+    demo-app-secret: ${KIS_DEMO_APP_SECRET:your-demo-app-secret}
+    demo-account-number: ${KIS_DEMO_ACCOUNT_NUMBER:}       # 모의투자 계좌번호 앞 8자리
+    demo-account-product-code: ${KIS_DEMO_ACCOUNT_PRODUCT_CODE:01}  # 모의투자 계좌번호 뒤 2자리
+
+# 정기 매수 스케줄러 설정
+scheduler:
+  purchase:
+    enabled: false                       # 스케줄러 활성화 여부
+    default-exchange-rate: 1450          # 기본 환율 (USD/KRW)
+    weekly-cron: "0 30 23 * * MON"       # 매주 월요일 23:30 (KST) - 장 시작
+    monthly-cron: "0 30 23 ? * MON#1"    # 매달 첫번째 월요일 23:30 (KST)
+    fallback-cron: "0 0 5 * * MON-FRI"   # 평일 05:00 (KST) - 장마감 1시간 전 미체결 체크
+
+    # 주간 매수 종목 (매주 월요일)
+    # budget-krw 설정 시: 원화 예산 기준 자동 수량 계산
+    # quantity 설정 시: 고정 수량 매수
+    stocks:
+      - exchange: NASDAQ
+        symbol: QLD              # ProShares Ultra QQQ (2x 레버리지)
+        budget-krw: 250000       # 25만원 예산 기준 매수
+        order-type: LIMIT
+        discount-rate: 0.02      # 현재가 대비 2% 할인
+        market-fallback: true    # 미체결 시 시장가 전환
+        enabled: true
+
+    # 월간 리밸런싱 (매달 첫번째 월요일)
+    # QLD 수익률 25% 이상 시 10% 매도 후 JEPQ 매수
+    rebalance:
+      enabled: false                 # 리밸런싱 활성화 여부
+      source-symbol: QLD             # 기준 종목 (수익률 확인 대상)
+      source-exchange: NASDAQ
+      target-symbol: JEPQ            # 매수 대상 종목
+      target-exchange: NASDAQ
+      trigger-profit-rate: 0.25      # 리밸런싱 트리거 수익률 (25%)
+      sell-rate: 0.10                # 매도 비율 (10%)
+      discount-rate: 0.02            # 지정가 주문 할인율 (2%)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    reactor.netty: WARN

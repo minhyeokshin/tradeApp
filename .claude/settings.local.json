@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__kis-code-assistant-mcp__read_source_code",
+      "mcp__kis-code-assistant-mcp__search_domestic_stock_api",
+      "mcp__kis-code-assistant-mcp__search_overseas_stock_api",
+      "Bash(cd:*)",
+      "Bash(./gradlew compileJava:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew compileTestJava:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew cleanTest test:*)"
+    ]
+  },
+  "mcpServers": {
+    "kis-code-assistant-mcp": {
+      "type": "http",
+      "url": "https://server.smithery.ai/@KISOpenAPI/kis-code-assistant-mcp/mcp"
+    }
+  }
+}
