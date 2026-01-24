@@ -21,7 +21,7 @@ server:
 external:
   kis:
     # ===== 투자 모드 설정 =====
-    demo-mode: true                              # true: 모의투자, false: 실전투자
+    demo-mode: ${KIS_DEMO_MODE:true}             # true: 모의투자, false: 실전투자
 
     # ===== API URL (자동 선택됨) =====
     base-url: https://openapi.koreainvestment.com:9443           # 실전투자 URL
@@ -44,7 +44,7 @@ external:
 # 정기 매수 스케줄러 설정
 scheduler:
   purchase:
-    enabled: false                       # 스케줄러 활성화 여부
+    enabled: true                        # 스케줄러 활성화 여부
     default-exchange-rate: 1450          # 기본 환율 (USD/KRW)
     weekly-cron: "0 30 23 * * MON"       # 매주 월요일 23:30 (KST) - 장 시작
     monthly-cron: "0 30 23 ? * MON#1"    # 매달 첫번째 월요일 23:30 (KST)
