@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -164,18 +165,17 @@ public class SlackNotificationService {
         }
 
         try {
-            webClient.post()
+            String response = webClient.post()
                     .uri(slackProperties.getWebhookUrl())
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
                     .bodyValue(payload)
                     .retrieve()
                     .bodyToMono(String.class)
-                    .subscribe(
-                            response -> log.debug("Slack 알림 전송 성공"),
-                            error -> log.error("Slack 알림 전송 실패: {}", error.getMessage())
-                    );
+                    .block();  // 동기 방식으로 전송
+
+            log.info("Slack 알림 전송 완료: {}", response);
         } catch (Exception e) {
-            log.error("Slack 알림 전송 중 오류: {}", e.getMessage());
+            log.error("Slack 알림 전송 실패: {}", e.getMessage());
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.stock.trade.scheduler;
 
 import com.stock.trade.config.KisProperties;
+import com.stock.trade.notification.SlackNotificationService;
 import com.stock.trade.scheduler.AbstractPurchaseScheduler.PurchaseResult;
 import com.stock.trade.scheduler.MarketFallbackScheduler.MarketFallbackResult;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class ScheduledPurchaseController {
     private final ScheduledPurchaseService purchaseService;
     private final ScheduledPurchaseProperties properties;
     private final KisProperties kisProperties;
+    private final SlackNotificationService slackNotificationService;
 
     /**
      * 스케줄러 설정 조회
@@ -115,5 +117,15 @@ public class ScheduledPurchaseController {
                 "enabled", properties.isEnabled(),
                 "message", enabled ? "스케줄러가 활성화되었습니다" : "스케줄러가 비활성화되었습니다"
         ));
+    }
+
+    /**
+     * Slack 알림 테스트
+     */
+    @PostMapping("/slack/test")
+    public ResponseEntity<Map<String, String>> testSlack() {
+        log.info("Slack 알림 테스트 요청");
+        slackNotificationService.sendCustomMessage(":white_check_mark: *Trade Bot Test*\nSlack notification is working!");
+        return ResponseEntity.ok(Map.of("message", "Slack test message sent"));
     }
 }

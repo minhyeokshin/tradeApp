@@ -9,7 +9,9 @@
       "Bash(./gradlew test:*)",
       "Bash(./gradlew compileTestJava:*)",
       "Bash(./gradlew build:*)",
-      "Bash(./gradlew cleanTest test:*)"
+      "Bash(./gradlew cleanTest test:*)",
+      "Bash(curl:*)",
+      "Bash(printf:*)"
     ]
   },
   "mcpServers": {

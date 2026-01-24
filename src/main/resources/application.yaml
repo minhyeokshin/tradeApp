@@ -77,7 +77,7 @@ scheduler:
 # Slack 알림 설정
 notification:
   slack:
-    enabled: false                                  # Slack 알림 활성화 여부
+    enabled: true                                  # Slack 알림 활성화 여부
     webhook-url: ${SLACK_WEBHOOK_URL:}              # Slack Incoming Webhook URL
     channel:                                        # 채널 (기본값: webhook 설정 채널)
     username: Trade Bot                             # 봇 이름
