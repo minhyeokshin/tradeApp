@@ -63,6 +63,8 @@ notification:
 
 ## API 엔드포인트
 
+### 스케줄러 API
+
 | Method | Path | 설명 |
 |--------|------|------|
 | GET | `/api/scheduler/config` | 스케줄러 설정 조회 |
@@ -70,3 +72,95 @@ notification:
 | POST | `/api/scheduler/execute/monthly` | 월간 리밸런싱 수동 실행 |
 | POST | `/api/scheduler/execute/fallback` | 미체결 시장가 전환 |
 | POST | `/api/scheduler/toggle?enabled=true` | 스케줄러 활성화/비활성화 |
+
+### 계좌 잔고 API
+
+| Method | Path | 설명 |
+|--------|------|------|
+| GET | `/api/account/balance` | 보유 종목 전체 조회 |
+| GET | `/api/account/balance/{symbol}` | 특정 종목 보유 정보 조회 |
+| GET | `/api/account/margin` | 통화별 예수금/출금가능금액 조회 |
+| GET | `/api/account/summary` | 계좌 전체 요약 정보 |
+
+## MCP (Model Context Protocol) 연동
+
+Claude Desktop 등 MCP를 지원하는 클라이언트에서 계좌 정보를 조회할 수 있습니다.
+
+### MCP 서버 설정
+
+Claude Desktop 설정 파일(`~/Library/Application Support/Claude/claude_desktop_config.json`)에 추가:
+
+```json
+{
+  "mcpServers": {
+    "kis-account": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "env": {
+        "ALLOWED_ORIGINS": "http://localhost:8080",
+        "FETCH_GET_ACCOUNT_BALANCE": "http://localhost:8080/api/account/balance",
+        "FETCH_GET_STOCK_HOLDING": "http://localhost:8080/api/account/balance/{symbol}",
+        "FETCH_GET_FOREIGN_MARGIN": "http://localhost:8080/api/account/margin",
+        "FETCH_GET_ACCOUNT_SUMMARY": "http://localhost:8080/api/account/summary"
+      }
+    }
+  }
+}
+```
+
+### 사용 가능한 MCP 도구
+
+- `get_account_balance` - 보유 종목 조회
+- `get_stock_holding` - 특정 종목 보유 여부 확인
+- `get_foreign_margin` - 통화별 예수금 조회
+- `get_account_summary` - 계좌 전체 요약
+
+## API 사용 예제
+
+### 보유 종목 전체 조회
+```bash
+curl http://localhost:8080/api/account/balance
+```
+
+### 특정 종목 보유 여부 확인 (예: AAPL)
+```bash
+curl http://localhost:8080/api/account/balance/AAPL
+```
+
+### 통화별 예수금 조회
+```bash
+curl http://localhost:8080/api/account/margin
+```
+
+### 계좌 요약 정보
+```bash
+curl http://localhost:8080/api/account/summary
+```
+
+응답 예시:
+```json
+{
+  "holdings": [
+    {
+      "symbol": "QQQ",
+      "quantity": 10,
+      "avgBuyPrice": 380.50,
+      "currentPrice": 395.20,
+      "profitLossAmount": 147.00,
+      "profitLossRate": 3.87
+    }
+  ],
+  "margins": [
+    {
+      "currencyCode": "USD",
+      "depositAmount": 5000.00,
+      "withdrawableAmount": 4800.00
+    }
+  ],
+  "totalEvalAmount": 3952.00,
+  "totalProfitLoss": 147.00,
+  "totalStocksCount": 1,
+  "profitStocksCount": 1,
+  "lossStocksCount": 0
+}
+```

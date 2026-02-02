@@ -1,0 +1,75 @@
+{
+  "mcpServers": {
+    "kis-account": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ],
+      "env": {
+        "KIS_API_BASE_URL": "http://localhost:8080"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "get_account_balance",
+      "description": "한국투자증권 계좌의 해외주식 보유 종목을 조회합니다. 종목별 평가금액, 수익률, 손익금액 등을 확인할 수 있습니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "exchangeCode": {
+            "type": "string",
+            "description": "거래소 코드 (기본값: NASD - 미국 전체)",
+            "default": "NASD",
+            "enum": ["NASD", "NYSE", "AMEX", "SEHK", "SHAA", "SZAA", "TKSE", "VNSE", "HASE"]
+          },
+          "currency": {
+            "type": "string",
+            "description": "통화 코드 (기본값: USD)",
+            "default": "USD",
+            "enum": ["USD", "HKD", "CNY", "JPY", "VND"]
+          }
+        }
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/account/balance"
+    },
+    {
+      "name": "get_stock_holding",
+      "description": "특정 종목의 보유 여부와 보유 정보를 조회합니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "종목 코드 (예: AAPL, TSLA, QQQ)"
+          }
+        },
+        "required": ["symbol"]
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/account/balance/${symbol}"
+    },
+    {
+      "name": "get_foreign_margin",
+      "description": "통화별 예수금 및 출금가능 금액을 조회합니다. (KRW, USD 등)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/account/margin"
+    },
+    {
+      "name": "get_account_summary",
+      "description": "계좌의 전체 요약 정보를 조회합니다. 보유 종목, 총 평가금액, 총 손익, 예수금 등을 한 번에 확인할 수 있습니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/account/summary"
+    }
+  ]
+}
