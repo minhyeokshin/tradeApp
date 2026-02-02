@@ -1,6 +1,8 @@
 #!/bin/bash
 # 모의투자 모드로 전환
 
+cd /home/minhyeok/tradeApp
+
 cat > .env << 'EOF'
 # 투자 모드
 KIS_DEMO_MODE=true
