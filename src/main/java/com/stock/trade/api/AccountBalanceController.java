@@ -1,5 +1,6 @@
 package com.stock.trade.api;
 
+import com.stock.trade.config.KisProperties;
 import com.stock.trade.overseas.ForeignMargin;
 import com.stock.trade.overseas.OverseasStockBalance;
 import com.stock.trade.overseas.OverseasStockService;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class AccountBalanceController {
 
     private final OverseasStockService overseasStockService;
+    private final KisProperties kisProperties;
 
     /**
      * 해외주식 보유 종목 조회
@@ -36,7 +38,12 @@ public class AccountBalanceController {
             @RequestParam(defaultValue = "NASD") String exchangeCode,
             @RequestParam(defaultValue = "USD") String currency
     ) {
-        log.info("계좌 잔고 조회 API 호출 - 거래소: {}, 통화: {}", exchangeCode, currency);
+        log.info("계좌 잔고 조회 API 호출 - 거래소: {}, 통화: {}, 모드: {}",
+                exchangeCode, currency, kisProperties.isDemoMode() ? "모의투자" : "실전투자");
+
+        // 모의투자/실전투자 모드 설정
+        overseasStockService.setDemoMode(kisProperties.isDemoMode());
+
         List<OverseasStockBalance> balances = overseasStockService.getBalance(exchangeCode, currency);
         return ResponseEntity.ok(balances);
     }
@@ -49,7 +56,12 @@ public class AccountBalanceController {
      */
     @GetMapping("/balance/{symbol}")
     public ResponseEntity<OverseasStockBalance> getBalanceBySymbol(@PathVariable String symbol) {
-        log.info("종목 보유 여부 조회 API 호출 - 종목: {}", symbol);
+        log.info("종목 보유 여부 조회 API 호출 - 종목: {}, 모드: {}",
+                symbol, kisProperties.isDemoMode() ? "모의투자" : "실전투자");
+
+        // 모의투자/실전투자 모드 설정
+        overseasStockService.setDemoMode(kisProperties.isDemoMode());
+
         OverseasStockBalance balance = overseasStockService.getBalanceBySymbol(symbol);
         if (balance != null) {
             return ResponseEntity.ok(balance);
@@ -65,7 +77,12 @@ public class AccountBalanceController {
      */
     @GetMapping("/margin")
     public ResponseEntity<List<ForeignMargin>> getForeignMargin() {
-        log.info("통화별 증거금 조회 API 호출");
+        log.info("통화별 증거금 조회 API 호출 - 모드: {}",
+                kisProperties.isDemoMode() ? "모의투자" : "실전투자");
+
+        // 모의투자/실전투자 모드 설정
+        overseasStockService.setDemoMode(kisProperties.isDemoMode());
+
         List<ForeignMargin> margins = overseasStockService.getForeignMargin();
         return ResponseEntity.ok(margins);
     }
@@ -77,7 +94,11 @@ public class AccountBalanceController {
      */
     @GetMapping("/summary")
     public ResponseEntity<Map<String, Object>> getAccountSummary() {
-        log.info("계좌 요약 정보 조회 API 호출");
+        log.info("계좌 요약 정보 조회 API 호출 - 모드: {}",
+                kisProperties.isDemoMode() ? "모의투자" : "실전투자");
+
+        // 모의투자/실전투자 모드 설정
+        overseasStockService.setDemoMode(kisProperties.isDemoMode());
 
         // 보유 종목 조회
         List<OverseasStockBalance> balances = overseasStockService.getBalance();
