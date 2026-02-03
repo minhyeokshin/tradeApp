@@ -1,9 +1,8 @@
 package com.stock.trade.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.stock.trade.config.KisProperties;
 import com.stock.trade.domestic.*;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -169,17 +168,17 @@ public class DomesticStockController {
     @PostMapping("/order/buy")
     public ResponseEntity<DomesticOrderResult> buy(@RequestBody OrderRequestDto request) {
         log.info("국내주식 매수 주문 API 호출 - 종목: {}, 수량: {}, 가격: {}, 주문유형: {}, 모드: {}",
-                request.stockCode(), request.quantity(), request.price(),
-                request.orderType(), kisProperties.isDemoMode() ? "모의투자" : "실전투자");
+                request.getStockCode(), request.getQuantity(), request.getPrice(),
+                request.getOrderType(), kisProperties.isDemoMode() ? "모의투자" : "실전투자");
 
         // 모의투자/실전투자 모드 설정
         domesticOrderService.setDemoMode(kisProperties.isDemoMode());
 
         DomesticOrderRequest orderRequest = DomesticOrderRequest.builder()
-                .stockCode(request.stockCode())
-                .quantity(request.quantity())
-                .price(request.price() != null ? request.price() : BigDecimal.ZERO)
-                .orderType(request.orderType() != null ? request.orderType() : DomesticOrderType.LIMIT)
+                .stockCode(request.getStockCode())
+                .quantity(request.getQuantity())
+                .price(request.getPrice() != null ? request.getPrice() : BigDecimal.ZERO)
+                .orderType(request.getOrderType() != null ? request.getOrderType() : DomesticOrderType.LIMIT)
                 .build();
 
         DomesticOrderResult result = domesticOrderService.buy(orderRequest);
@@ -195,17 +194,17 @@ public class DomesticStockController {
     @PostMapping("/order/sell")
     public ResponseEntity<DomesticOrderResult> sell(@RequestBody OrderRequestDto request) {
         log.info("국내주식 매도 주문 API 호출 - 종목: {}, 수량: {}, 가격: {}, 주문유형: {}, 모드: {}",
-                request.stockCode(), request.quantity(), request.price(),
-                request.orderType(), kisProperties.isDemoMode() ? "모의투자" : "실전투자");
+                request.getStockCode(), request.getQuantity(), request.getPrice(),
+                request.getOrderType(), kisProperties.isDemoMode() ? "모의투자" : "실전투자");
 
         // 모의투자/실전투자 모드 설정
         domesticOrderService.setDemoMode(kisProperties.isDemoMode());
 
         DomesticOrderRequest orderRequest = DomesticOrderRequest.builder()
-                .stockCode(request.stockCode())
-                .quantity(request.quantity())
-                .price(request.price() != null ? request.price() : BigDecimal.ZERO)
-                .orderType(request.orderType() != null ? request.orderType() : DomesticOrderType.LIMIT)
+                .stockCode(request.getStockCode())
+                .quantity(request.getQuantity())
+                .price(request.getPrice() != null ? request.getPrice() : BigDecimal.ZERO)
+                .orderType(request.getOrderType() != null ? request.getOrderType() : DomesticOrderType.LIMIT)
                 .build();
 
         DomesticOrderResult result = domesticOrderService.sell(orderRequest);
@@ -238,15 +237,15 @@ public class DomesticStockController {
     @PostMapping("/order/cancel")
     public ResponseEntity<DomesticOrderResult> cancelOrder(@RequestBody CancelRequestDto request) {
         log.info("국내주식 주문 취소 API 호출 - 주문번호: {}, 수량: {}, 모드: {}",
-                request.orderNumber(), request.quantity(),
+                request.getOrderNumber(), request.getQuantity(),
                 kisProperties.isDemoMode() ? "모의투자" : "실전투자");
 
         // 모의투자/실전투자 모드 설정
         domesticOrderService.setDemoMode(kisProperties.isDemoMode());
 
         DomesticOrderResult result = domesticOrderService.cancelOrder(
-                request.orderNumber(),
-                request.quantity() != null ? request.quantity() : 0
+                request.getOrderNumber(),
+                request.getQuantity() != null ? request.getQuantity() : 0
         );
         return ResponseEntity.ok(result);
     }
@@ -256,18 +255,26 @@ public class DomesticStockController {
     /**
      * 주문 요청 DTO
      */
-    public record OrderRequestDto(
-            @JsonProperty("stockCode") String stockCode,
-            @JsonProperty("quantity") int quantity,
-            @JsonProperty("price") BigDecimal price,
-            @JsonProperty("orderType") DomesticOrderType orderType
-    ) {}
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OrderRequestDto {
+        private String stockCode;
+        private int quantity;
+        private BigDecimal price;
+        private DomesticOrderType orderType;
+    }
 
     /**
      * 취소 요청 DTO
      */
-    public record CancelRequestDto(
-            @JsonProperty("orderNumber") String orderNumber,
-            @JsonProperty("quantity") Integer quantity  // null이면 전량 취소
-    ) {}
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CancelRequestDto {
+        private String orderNumber;
+        private Integer quantity;  // null이면 전량 취소
+    }
 }
