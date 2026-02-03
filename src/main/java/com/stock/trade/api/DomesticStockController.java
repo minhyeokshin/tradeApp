@@ -2,7 +2,7 @@ package com.stock.trade.api;
 
 import com.stock.trade.config.KisProperties;
 import com.stock.trade.domestic.*;
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -166,7 +166,7 @@ public class DomesticStockController {
      * @return 주문 결과
      */
     @PostMapping("/order/buy")
-    public ResponseEntity<DomesticOrderResult> buy(@RequestBody OrderRequestDto request) {
+    public ResponseEntity<DomesticOrderResult> buy(@RequestBody DomesticOrderRequestDto request) {
         log.info("국내주식 매수 주문 API 호출 - 종목: {}, 수량: {}, 가격: {}, 주문유형: {}, 모드: {}",
                 request.getStockCode(), request.getQuantity(), request.getPrice(),
                 request.getOrderType(), kisProperties.isDemoMode() ? "모의투자" : "실전투자");
@@ -192,7 +192,7 @@ public class DomesticStockController {
      * @return 주문 결과
      */
     @PostMapping("/order/sell")
-    public ResponseEntity<DomesticOrderResult> sell(@RequestBody OrderRequestDto request) {
+    public ResponseEntity<DomesticOrderResult> sell(@RequestBody DomesticOrderRequestDto request) {
         log.info("국내주식 매도 주문 API 호출 - 종목: {}, 수량: {}, 가격: {}, 주문유형: {}, 모드: {}",
                 request.getStockCode(), request.getQuantity(), request.getPrice(),
                 request.getOrderType(), kisProperties.isDemoMode() ? "모의투자" : "실전투자");
@@ -235,7 +235,7 @@ public class DomesticStockController {
      * @return 취소 결과
      */
     @PostMapping("/order/cancel")
-    public ResponseEntity<DomesticOrderResult> cancelOrder(@RequestBody CancelRequestDto request) {
+    public ResponseEntity<DomesticOrderResult> cancelOrder(@RequestBody DomesticCancelRequestDto request) {
         log.info("국내주식 주문 취소 API 호출 - 주문번호: {}, 수량: {}, 모드: {}",
                 request.getOrderNumber(), request.getQuantity(),
                 kisProperties.isDemoMode() ? "모의투자" : "실전투자");
@@ -250,31 +250,4 @@ public class DomesticStockController {
         return ResponseEntity.ok(result);
     }
 
-    // ==================== Request DTOs ====================
-
-    /**
-     * 주문 요청 DTO
-     */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OrderRequestDto {
-        private String stockCode;
-        private int quantity;
-        private BigDecimal price;
-        private DomesticOrderType orderType;
-    }
-
-    /**
-     * 취소 요청 DTO
-     */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CancelRequestDto {
-        private String orderNumber;
-        private Integer quantity;  // null이면 전량 취소
-    }
 }

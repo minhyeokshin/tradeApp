@@ -13,7 +13,16 @@
       "Bash(curl:*)",
       "Bash(printf:*)",
       "Bash(lsof:*)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(docker build:*)",
+      "Bash(./gradlew clean build:*)",
+      "Bash(chmod:*)",
+      "Bash(gh run list:*)",
+      "Bash(xargs:*)",
+      "Bash(./gradlew bootRun:*)"
     ]
   },
   "mcpServers": {
