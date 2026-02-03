@@ -150,7 +150,7 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "stockCode": {
+          "stock_code": {
             "type": "string",
             "description": "종목코드 (6자리 숫자, 예: 005930 삼성전자)"
           },
@@ -162,14 +162,14 @@
             "type": "number",
             "description": "주문단가 (시장가 주문 시 0)"
           },
-          "orderType": {
+          "order_type": {
             "type": "string",
             "description": "주문유형",
             "default": "LIMIT",
             "enum": ["LIMIT", "MARKET", "CONDITIONAL_LIMIT", "BEST_LIMIT", "PRIORITY_LIMIT"]
           }
         },
-        "required": ["stockCode", "quantity"]
+        "required": ["stock_code", "quantity"]
       },
       "method": "POST",
       "url": "${KIS_API_BASE_URL}/api/domestic/order/buy"
@@ -180,7 +180,7 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "stockCode": {
+          "stock_code": {
             "type": "string",
             "description": "종목코드 (6자리 숫자, 예: 005930 삼성전자)"
           },
@@ -192,14 +192,14 @@
             "type": "number",
             "description": "주문단가 (시장가 주문 시 0)"
           },
-          "orderType": {
+          "order_type": {
             "type": "string",
             "description": "주문유형",
             "default": "LIMIT",
             "enum": ["LIMIT", "MARKET", "CONDITIONAL_LIMIT", "BEST_LIMIT", "PRIORITY_LIMIT"]
           }
         },
-        "required": ["stockCode", "quantity"]
+        "required": ["stock_code", "quantity"]
       },
       "method": "POST",
       "url": "${KIS_API_BASE_URL}/api/domestic/order/sell"
@@ -220,7 +220,7 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "orderNumber": {
+          "order_number": {
             "type": "string",
             "description": "취소할 주문번호"
           },
@@ -230,7 +230,7 @@
             "default": 0
           }
         },
-        "required": ["orderNumber"]
+        "required": ["order_number"]
       },
       "method": "POST",
       "url": "${KIS_API_BASE_URL}/api/domestic/order/cancel"
