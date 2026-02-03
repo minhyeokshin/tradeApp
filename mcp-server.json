@@ -37,7 +37,7 @@
     },
     {
       "name": "get_stock_holding",
-      "description": "특정 종목의 보유 여부와 보유 정보를 조회합니다.",
+      "description": "특정 해외주식 종목의 보유 여부와 보유 정보를 조회합니다.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -63,13 +63,177 @@
     },
     {
       "name": "get_account_summary",
-      "description": "계좌의 전체 요약 정보를 조회합니다. 보유 종목, 총 평가금액, 총 손익, 예수금 등을 한 번에 확인할 수 있습니다.",
+      "description": "해외주식 계좌의 전체 요약 정보를 조회합니다. 보유 종목, 총 평가금액, 총 손익, 예수금 등을 한 번에 확인할 수 있습니다.",
       "inputSchema": {
         "type": "object",
         "properties": {}
       },
       "method": "GET",
       "url": "${KIS_API_BASE_URL}/api/account/summary"
+    },
+    {
+      "name": "get_domestic_stock_price",
+      "description": "국내주식 현재가를 조회합니다. 현재가, 등락률, 거래량, 시가총액, PER, PBR 등 종목 정보를 확인할 수 있습니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "stockCode": {
+            "type": "string",
+            "description": "종목코드 (6자리 숫자, 예: 005930 삼성전자, 000660 SK하이닉스)"
+          }
+        },
+        "required": ["stockCode"]
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/domestic/price/${stockCode}"
+    },
+    {
+      "name": "get_domestic_balance",
+      "description": "국내주식 보유 종목을 조회합니다. 종목별 보유수량, 평가금액, 수익률, 손익금액 등을 확인할 수 있습니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/domestic/balance"
+    },
+    {
+      "name": "get_domestic_stock_holding",
+      "description": "특정 국내주식 종목의 보유 여부와 보유 정보를 조회합니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "stockCode": {
+            "type": "string",
+            "description": "종목코드 (6자리 숫자, 예: 005930 삼성전자)"
+          }
+        },
+        "required": ["stockCode"]
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/domestic/balance/${stockCode}"
+    },
+    {
+      "name": "get_domestic_purchasable_amount",
+      "description": "국내주식 매수가능금액을 조회합니다. 지정한 종목과 가격 기준으로 최대 매수 가능 수량을 확인할 수 있습니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "stockCode": {
+            "type": "string",
+            "description": "종목코드 (6자리 숫자, 예: 005930 삼성전자)"
+          },
+          "price": {
+            "type": "number",
+            "description": "주문단가 (0이면 현재가 기준)",
+            "default": 0
+          }
+        },
+        "required": ["stockCode"]
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/domestic/purchasable?stockCode=${stockCode}&price=${price}"
+    },
+    {
+      "name": "get_domestic_account_summary",
+      "description": "국내주식 계좌의 전체 요약 정보를 조회합니다. 보유 종목, 총 평가금액, 총 매입금액, 총 손익 등을 한 번에 확인할 수 있습니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/domestic/summary"
+    },
+    {
+      "name": "buy_domestic_stock",
+      "description": "국내주식 매수 주문을 실행합니다. 지정가 또는 시장가 주문이 가능합니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "stockCode": {
+            "type": "string",
+            "description": "종목코드 (6자리 숫자, 예: 005930 삼성전자)"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "주문수량"
+          },
+          "price": {
+            "type": "number",
+            "description": "주문단가 (시장가 주문 시 0)"
+          },
+          "orderType": {
+            "type": "string",
+            "description": "주문유형",
+            "default": "LIMIT",
+            "enum": ["LIMIT", "MARKET", "CONDITIONAL_LIMIT", "BEST_LIMIT", "PRIORITY_LIMIT"]
+          }
+        },
+        "required": ["stockCode", "quantity"]
+      },
+      "method": "POST",
+      "url": "${KIS_API_BASE_URL}/api/domestic/order/buy"
+    },
+    {
+      "name": "sell_domestic_stock",
+      "description": "국내주식 매도 주문을 실행합니다. 지정가 또는 시장가 주문이 가능합니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "stockCode": {
+            "type": "string",
+            "description": "종목코드 (6자리 숫자, 예: 005930 삼성전자)"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "주문수량"
+          },
+          "price": {
+            "type": "number",
+            "description": "주문단가 (시장가 주문 시 0)"
+          },
+          "orderType": {
+            "type": "string",
+            "description": "주문유형",
+            "default": "LIMIT",
+            "enum": ["LIMIT", "MARKET", "CONDITIONAL_LIMIT", "BEST_LIMIT", "PRIORITY_LIMIT"]
+          }
+        },
+        "required": ["stockCode", "quantity"]
+      },
+      "method": "POST",
+      "url": "${KIS_API_BASE_URL}/api/domestic/order/sell"
+    },
+    {
+      "name": "get_domestic_unfilled_orders",
+      "description": "국내주식 미체결 주문 내역을 조회합니다. 아직 체결되지 않은 매수/매도 주문을 확인할 수 있습니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "method": "GET",
+      "url": "${KIS_API_BASE_URL}/api/domestic/order/unfilled"
+    },
+    {
+      "name": "cancel_domestic_order",
+      "description": "국내주식 미체결 주문을 취소합니다. 주문번호로 특정 주문을 취소할 수 있습니다.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "orderNumber": {
+            "type": "string",
+            "description": "취소할 주문번호"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "취소수량 (0 또는 미입력 시 전량 취소)",
+            "default": 0
+          }
+        },
+        "required": ["orderNumber"]
+      },
+      "method": "POST",
+      "url": "${KIS_API_BASE_URL}/api/domestic/order/cancel"
     }
   ]
 }
