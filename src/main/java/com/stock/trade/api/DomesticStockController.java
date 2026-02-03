@@ -1,5 +1,6 @@
 package com.stock.trade.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.stock.trade.config.KisProperties;
 import com.stock.trade.domestic.*;
 import lombok.RequiredArgsConstructor;
@@ -256,17 +257,17 @@ public class DomesticStockController {
      * 주문 요청 DTO
      */
     public record OrderRequestDto(
-            String stockCode,
-            int quantity,
-            BigDecimal price,
-            DomesticOrderType orderType
+            @JsonProperty("stockCode") String stockCode,
+            @JsonProperty("quantity") int quantity,
+            @JsonProperty("price") BigDecimal price,
+            @JsonProperty("orderType") DomesticOrderType orderType
     ) {}
 
     /**
      * 취소 요청 DTO
      */
     public record CancelRequestDto(
-            String orderNumber,
-            Integer quantity  // null이면 전량 취소
+            @JsonProperty("orderNumber") String orderNumber,
+            @JsonProperty("quantity") Integer quantity  // null이면 전량 취소
     ) {}
 }
